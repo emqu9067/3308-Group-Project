@@ -1,0 +1,46 @@
+Meeting Log: Wednesday 7/5/23
+
+Meeting with Rohan @ 5pm
+- Overall Note: Should have seen more implemented. Need to pick up the pace.
+- Approx. 2.5 weeks until deadline (aim to have everything complete by the 23rd)
+- Simplify the user interface as much as possible (avoid the time sink)
+- Given limited time, might be beneficial to divide work based on individual skill set
+- Suggested adding milestones to help solidify and show project completion
+- Focus on delivering end-to-end features before refining previous work
+- List of items to start with
+  - UX for 'Home', 'Login', and 'Registration' pages
+  - 'Create an Account' feature, with database stroage
+  - Create database (db) schema, deploy db, create tables in db
+
+
+  
+Meeting with Team @ 7pm
+- Overall: Planned out beginning steps and divided the work. See Below.
+
+Date Goal: Sat @ 5pm (maybe Sunday TBD if changed)
+
+Aiden: 
+  1) Work on 'Login Page' credential retrieval/query against database (need schema from Zach)
+  2) Help Haoxuan
+  3) Ice-Box (projects page)
+  
+Alexis: 
+  1) Work on 'Registration' retrieval/query against database/save to database (need schema from Zach)
+  2) Help Emanuel
+  3) Ice-Box (projects page)
+  
+Emanuel: 
+  1) Design and implement UX for 'Home', 'Login', and 'Registration' pages (talk to Haoxuan about format)
+  2) Help Haoxuan
+  3) Ice-Box (projects page)
+
+Haoxuan: 
+  1) Design and implement UX for game play page and deck of cards (talk to Emanuel about format)
+  2) Help Emanuel
+  3) Ice-Box (projects page)
+
+Zach: 
+  1) Create database (db) schema, deploy db, create tables in db
+  2) Help Aiden & Alexis
+  3) Help Haoxuan
+  4) Ice-Box (projects page)
