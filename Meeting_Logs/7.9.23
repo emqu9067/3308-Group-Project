@@ -1,0 +1,35 @@
+Meeting Log: Wednesday 7/9/23
+
+Meeting with Team @ 7pm
+- Overall: Discussed if work from Wednesday was complete yet, and next steps of implementation.
+
+Reminders:
+- Create a branch for each user story when uploading files to GitHub
+- 2 weeks until project due date
+- Focus on MVP and implementing end-to-end features
+
+Date Goal: Wednesday by 5pm 
+
+Aiden: 
+  1) Finish work on 'Login Page' credential retrieval/query against database. Includes hashing of passwords.
+  2) Help Alexis
+  3) Ice-Box (projects page)
+  
+Alexis: 
+  1) Work on game play mechanics and querying the database during play
+  2) Ice-Box (projects page)
+  
+Emanuel: 
+  1) Finish templating for 'Home', 'Login', and 'Registration' pages
+  2) Ice-Box (projects page)
+
+Haoxuan: 
+  1) Work with Alexis on game play mechanics/database endpoints
+  2) Ice-Box (projects page)
+
+Zach: 
+  1) Work on game play page UI and templating
+  2) Help Aiden & Alexis
+  3) Ice-Box (projects page)
+
+Attendance: https://docs.google.com/spreadsheets/d/1aZUIZhGt6Tji675UOeGpSQgsJR0gQ55nssEpKfJznEI/edit?usp=sharing
