@@ -8,6 +8,8 @@ const pgp = require('pg-promise')();
 require('dotenv').config();
 
 const http = require('http');
+const Card = require('./card.js');
+const Table = require('./table.js');
 // **************
 // Initialization (copied from lab 7)
 // **************
