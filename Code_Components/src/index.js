@@ -1,8 +1,8 @@
-const express = require("express");
+const express = require('express');
 const app = express();
-const pgp = require("pg-promise")();
-const bodyParser = require("body-parser");
-const session = require("express-session");
+const pgp = require('pg-promise')();
+const bodyParser = require('body-parser');
+const session = require('express-session');
 
 // db config
 const dbConfig = {
@@ -76,7 +76,6 @@ app.post('/register_user', function(req, res) {
        message: 'Successfully registered user',
      });
    })
-
    .catch(function(err){
      return console.log(err);
    });
@@ -145,4 +144,4 @@ app.get("/logout", (req, res) => {
 });
 
 app.listen(4000);
-console.log("Server is listening on port 4000");
+console.log("Server is listening on port 3000");
