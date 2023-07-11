@@ -89,7 +89,7 @@ app.get("/login", (req, res) => {
 app.post("/login", (req, res) => {
   const email = req.body.email;
   const username = req.body.username;
-  const query = "select * from students where students.email = $1";
+  const query = "select * from player where player.email = $1";
   const values = [email];
 
   // get the student_id based on the emailid
@@ -126,7 +126,7 @@ const auth = (req, res, next) => {
 app.use(auth);
 
 app.get("/", (req, res) => {
-  res.render("pages/home", {
+  res.render("pages/play", {
     username: req.session.user.username,
     first_name: req.session.user.first_name,
     last_name: req.session.user.last_name,
