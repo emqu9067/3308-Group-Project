@@ -154,3 +154,86 @@ app.get('/check_email', function(req, res) {
      return console.log(err);
    });
 })
+
+
+app.post('/table/add_card_to_hand', function(req, res) {
+   var hand_id = req.body.hand_id;
+   var suit = req.body.suit;
+   var rank = req.body.rank;
+   var dealer_hand = req.body.dealer_hand;
+
+   const query = `INSERT INTO card (id, hand_id, suit, rank, dealer_hand) VALUES (DEFAULT, '${hand_id}', '${suit}', '${rank}', '${dealer_hand}');`
+
+   db.any(query)
+
+   .then(function(data)
+   {
+      res.status(200).json({
+         status: 'success',
+         message: 'Added card to database.',
+      })
+   })
+   .catch(function(err){
+      return console.log(err);
+   })
+})
+
+app.post('/table/add_hand', function(req, res) {
+   var session_id = req.body.session_id;
+   var player_id = req.body.player_id;
+   var bet_amount = req.body.bet_amount;
+   var is_winner = req.body.is_winner;
+
+   const query = `INSERT INTO hand (id, session_id, player_id, bet_amount, is_winner) VALUES (DEFAULT, '${session_id}', '${player_id}', '${bet_amount}', '${is_winner}');`
+
+   db.any(query)
+
+   .then(function(data)
+   {
+      res.status(200).json({
+         status: 'success',
+         message: 'Added hand to database.',
+      })
+   })
+   .catch(function(err){
+      return console.log(err);
+   })
+})
+
+app.post('/table/begin_session', function(req, res) {
+   var player_id = req.body.player_id;
+   var start_time = Date.now();
+
+   const query = `INSERT INTO session (id, player_id, start_time, end_time) VALUES (DEFAULT, '${player_id}', '${start_time}', NULL);`
+   db.any(query)
+
+   .then(function(data)
+   {
+      res.status(200).json({
+         status: 'success',
+         message: 'Began session.',
+      })
+   })
+   .catch(function(err){
+      return console.log(err);
+   })
+})
+
+app.post('/table/end_session', function(req, res) {
+   var session_id = req.body.sessionid;
+   var end_time = Date.now();
+
+   const query = `UPDATE session SET end_time = ${end_time} WHERE session_id = ${session_id};`
+   db.any(query)
+
+   .then(function(data)
+   {
+      res.status(200).json({
+         status: 'success',
+         message: 'Ended session.',
+      })
+   })
+   .catch(function(err){
+      return console.log(err);
+   })
+})
