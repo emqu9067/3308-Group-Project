@@ -1,0 +1,28 @@
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    text-align: center;
+}
+
+#dealer-cards img {
+    height: 11rem;
+    width: 8rem;
+    margin: 0.1rem;
+}
+
+#player-cards img {
+    height: 11rem;
+    width: 8rem;
+    margin: 0.1rem;
+}
+
+#hit {
+    width: 6.5rem;
+    height: 3.25rem;
+    font-size: 1.25rem;
+}
+
+#stay {
+    width: 6.5rem;
+    height: 3.25rem;
+    font-size: 1.25rem;
+}
