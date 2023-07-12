@@ -202,7 +202,7 @@ app.post('/table/add_hand', function(req, res) {
 
 app.post('/table/begin_session', function(req, res) {
    var player_id = req.body.player_id;
-   var start_time = Date.now();
+   var start_time = new Date(Date.now()).toISOString();
 
    const query = `INSERT INTO session (id, player_id, start_time, end_time) VALUES (DEFAULT, '${player_id}', '${start_time}', NULL);`
    db.any(query)
@@ -220,10 +220,10 @@ app.post('/table/begin_session', function(req, res) {
 })
 
 app.post('/table/end_session', function(req, res) {
-   var session_id = req.body.sessionid;
-   var end_time = Date.now();
+   var session_id = req.body.session_id;
+   var end_time = new Date(Date.now()).toISOString();
 
-   const query = `UPDATE session SET end_time = ${end_time} WHERE session_id = ${session_id};`
+   const query = `UPDATE session SET end_time = '${end_time}' WHERE id = '${session_id}';`
    db.any(query)
 
    .then(function(data)
