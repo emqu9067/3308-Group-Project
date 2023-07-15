@@ -1,9 +1,11 @@
 const express = require('express');
 const app = express();
+var path = require('path');
 const pgp = require('pg-promise')();
 const bodyParser = require('body-parser');
 const session = require('express-session');
-
+require('dotenv').config();
+app.set('views', path.join(__dirname, '/views'));
 // db config
 const dbConfig = {
   host: process.env.POSTGRES_HOST,
@@ -82,7 +84,7 @@ app.post('/register_user', function(req, res) {
 })
 
 app.get("/login", (req, res) => {
-  res.render("pages/login");
+  res.render('pages/login');
 });
 
 // Login submission
@@ -144,4 +146,4 @@ app.get("/logout", (req, res) => {
 });
 
 app.listen(4000);
-console.log("Server is listening on port 3000");
+console.log("Server is listening on port 4000");
