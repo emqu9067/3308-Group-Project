@@ -205,6 +205,7 @@ app.post('/table/begin_session', function(req, res) {
    var start_time = new Date(Date.now()).toISOString();
 
    const query = `INSERT INTO session (id, player_id, start_time, end_time) VALUES (DEFAULT, '${player_id}', '${start_time}', NULL);`
+   console.log(query)
    db.any(query)
 
    .then(function(data)
@@ -212,6 +213,7 @@ app.post('/table/begin_session', function(req, res) {
       res.status(200).json({
          status: 'success',
          message: 'Began session.',
+         session_id: data.id
       })
    })
    .catch(function(err){
@@ -219,10 +221,11 @@ app.post('/table/begin_session', function(req, res) {
    })
 })
 
-app.post('/table/end_session', function(req, res) {
+app.post('/table/update_session', function(req, res) {
    var session_id = req.body.session_id;
    var end_time = new Date(Date.now()).toISOString();
 
+   console.log("updated session");
    const query = `UPDATE session SET end_time = '${end_time}' WHERE id = '${session_id}';`
    db.any(query)
 
@@ -237,3 +240,37 @@ app.post('/table/end_session', function(req, res) {
       return console.log(err);
    })
 })
+
+// Other pages
+
+const path = require('path')
+//app.set('views', path.join(__dirname, 'views'));
+
+app.set('view engine', 'ejs');
+
+app.get('/table', function(req, res) {
+   
+   res.render(path.join(__dirname+'/views/pages/table.ejs'))
+})
+
+app.use(express.static(path.join(__dirname, 'resources')));
+
+app.get('/table/get_current_session', function(req, res)
+{
+   var player_id = req.query.player_id;
+
+   const query = `SELECT * FROM session WHERE player_id = ${player_id} AND end_time IS NULL;`
+   console.log(query);
+   
+   test = db.one(query)
+      .then(function(data)
+      {
+         res.status(200).json({
+            status: 'success',
+            session_id: data.id
+         })
+      })
+      .catch(function(err){
+         console.log(err);
+      });
+});

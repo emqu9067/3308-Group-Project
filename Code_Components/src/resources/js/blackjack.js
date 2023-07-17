@@ -6,11 +6,85 @@ var hiddenCard;
 var deck;
 var canHit = true;
 
+let global_session_id;
+
 window.onload = function() 
 {
+    // 1. Begin the session
+    session = begin_session()
+    // 3. Begin the game
+    .then(function(session_id){
+        console.log(session_id);
+        global_session_id = session_id;
+        begin_game();
+    });
+}
+
+function begin_session()
+{
+    session = fetch('/table/begin_session', {
+        method:'POST', 
+        headers: {
+            'Content-Type': 'application/json'
+        }, 
+        body: JSON.stringify({player_id: 1})
+    })
+    // 2. Get the session id
+    session_id = new Promise((resolve, reject) => {
+        get_session_id()
+            .then(function(res) {
+                resolve(res)
+            })
+            .catch(function(error) {
+            console.log(error);
+            })
+      })
+
+      return session_id;
+}
+
+function get_session_id()
+{
+    response = new Promise((resolve, reject) => {
+        fetch('/table/get_current_session?player_id=1')
+            .then(function(data)
+            {
+                return data.json();
+            })
+            .then(function(data) {
+                //console.log(data.session_id);
+                resolve(data.session_id);
+            })
+            .catch(function(err)
+            {
+                console.log(err);
+                reject("Error");
+            })
+    })
+
+    //console.log(response)
+
+    return response;
+}
+async function begin_game()
+{
+    await global_session_id; 
+    update_session(global_session_id);
     createDeck();
     shuffleDeck();
     startHand();
+}
+
+function update_session()
+{
+    // console.log(session_id)
+    fetch('/table/update_session', {
+        method:'POST', 
+        headers: {
+            'Content-Type': 'application/json'
+        }, 
+        body: JSON.stringify({session_id: global_session_id})
+    })
 }
 
 function createDeck() 
@@ -47,7 +121,7 @@ function startHand()
 
     let cardImg = document.createElement("img");
     let card = deck.pop();
-    cardImg.src = "../../resources/img/cards/" + card + ".svg";
+    cardImg.src = "/img/cards/" + card + ".svg";
     dealerSum += getValue(card);
     dealerAces += checkAce(card);
     document.getElementById("dealer-cards").append(cardImg);
@@ -56,7 +130,7 @@ function startHand()
     {
         let cardImg = document.createElement("img");
         let card = deck.pop();
-        cardImg.src = "../../resources/img/cards/" + card + ".svg";
+        cardImg.src = "/img/cards/" + card + ".svg";
         playerSum += getValue(card);
         playerAces += checkAce(card);
         document.getElementById("player-cards").append(cardImg);
@@ -64,7 +138,7 @@ function startHand()
 
     if (playerSum == 21 || dealerSum == 21) 
     {
-        document.getElementById("hidden-card").src = "../../resources/img/cards/" + hiddenCard + ".svg";
+        document.getElementById("hidden-card").src = "/img/cards/" + hiddenCard + ".svg";
         canHit = false;
         finishHand();
     }
@@ -86,7 +160,7 @@ function stay()
     
     canHit = false;
 
-    document.getElementById("hidden-card").src = "../../resources/img/cards/" + hiddenCard + ".svg";
+    document.getElementById("hidden-card").src = "/img/cards/" + hiddenCard + ".svg";
 
     finishDealer();
     finishHand();
@@ -98,7 +172,7 @@ function finishDealer()
     {
         let cardImg = document.createElement("img");
         let card = deck.pop();
-        cardImg.src = "../../resources/img/cards/" + card + ".svg";
+        cardImg.src = "/img/cards/" + card + ".svg";
         dealerSum += getValue(card);
         dealerAces += checkAce(card);
         document.getElementById("dealer-cards").append(cardImg);
@@ -131,7 +205,7 @@ function hit()
     
     let cardImg = document.createElement("img");
     let card = deck.pop();
-    cardImg.src = "../../resources/img/cards/" + card + ".svg";
+    cardImg.src = "/img/cards/" + card + ".svg";
     playerSum += getValue(card);
     playerAces += checkAce(card);
     document.getElementById("player-cards").append(cardImg);
