@@ -16,6 +16,11 @@ window.onload = function()
     .then(function(session_id){
         console.log(session_id);
         global_session_id = session_id;
+
+        // Update the session whenever the user clicks on anywhere on the page.
+        test = document.querySelector("body")
+        test.addEventListener('click', console.log("test"));
+
         begin_game();
     });
 }
@@ -31,7 +36,7 @@ async function begin_session()
     })
     // 2. Get the session id
     await session;
-    
+
     session_id = new Promise((resolve, reject) => {
         get_session_id()
             .then(function(res) {
@@ -63,8 +68,6 @@ function get_session_id()
                 reject("Error");
             })
     })
-
-    //console.log(response)
 
     return response;
 }
@@ -100,6 +103,7 @@ function createDeck()
         for (let j = 0; j < ranks.length; j++) 
         {
             deck.push(ranks[j] + "-" + suits[i]);
+            
         }
     }
 }
