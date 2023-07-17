@@ -6,27 +6,36 @@ var hiddenCard;
 var deck;
 var canHit = true;
 
+// Documenting everything I've done today (7/16) because it's a real clusterfuck and I know I won't remember how it works if I don't do this now
+
+// Global variable so we don't have to fuck around with parameters for every function or whatever
+// (Now that I think about it the way I've implemented it we wouldn't need that but w h a t e v e r)
 let global_session_id;
 
+// On loading the window, this calls the begin_session function, which calls the get_session_id function (may be unnecessary, may fix)
 window.onload = function() 
 {
-    // 1. Begin the session
+    // Call the begin_session() function, which returns an integer.
     session = begin_session()
     // 3. Begin the game
     .then(function(session_id){
+        // This console.log is for debugging. Sometimes it doesn't pass the session id??
         console.log(session_id);
+        // Save it to the global session id variable
         global_session_id = session_id;
-
-        // Update the session whenever the user clicks on anywhere on the page.
-        test = document.querySelector("body")
-        test.addEventListener('click', console.log("test"));
-
+        
+        // Now that this is done, start the game. 
+        //This is within the .then() method because update_session() must activate after this.
         begin_game();
     });
 }
 
+// begin_session function. This is async because it needs to wait for the fetch() command within it
+// (.then() wasn't really working right, I couldn't quite figure out how to resolve things properly)
 async function begin_session()
 {
+    // Call the begin_session endpoint, which does not return anything
+    // (This may change later)
     session = fetch('/table/begin_session', {
         method:'POST', 
         headers: {
@@ -34,34 +43,43 @@ async function begin_session()
         }, 
         body: JSON.stringify({player_id: 1})
     })
-    // 2. Get the session id
+    // Wait for this above Promise to resolve.
     await session;
 
+    // Now set up session_id as a Promise, which will call the get_session_id() function
     session_id = new Promise((resolve, reject) => {
         get_session_id()
+            // If get_session_id returns a valid number, then resolve the session_id Promise as that
             .then(function(res) {
                 resolve(res)
             })
-            .catch(function(error) {
-            console.log(error);
+            // Otherwise, set it as the error
+            .catch(function(err) {
+            console.log(err);
+            reject(err)
             })
       })
 
+    // Return the (hopefully) resolved session_id
       return session_id;
 }
 
-function get_session_id()
+// This function is also async for similar reasons.
+async function get_session_id()
 {
+    // Set up a Promise which requests the get_curren_session endpoint
     response = new Promise((resolve, reject) => {
-        fetch('/table/get_current_session?player_id=1')
+        fetch('/table/get_current_session?player_id=1') // Change this when the login thing is working
+            // This returns a Promise, so you have to have this here to convert it to a JSON.
             .then(function(data)
             {
                 return data.json();
             })
+            // Then resolve the Promise with the proper session id
             .then(function(data) {
-                //console.log(data.session_id);
                 resolve(data.session_id);
             })
+            // Otherwise, set reject the Promise as the error
             .catch(function(err)
             {
                 console.log(err);
@@ -69,8 +87,14 @@ function get_session_id()
             })
     })
 
+    // Wait for the above Promise to resolve
+    await response;
+
+    // Return the (hopefully) resolved session id.
     return response;
 }
+
+// Async because the begin_session stuff has to activate first.
 async function begin_game()
 {
     await global_session_id; 
@@ -103,7 +127,18 @@ function createDeck()
         for (let j = 0; j < ranks.length; j++) 
         {
             deck.push(ranks[j] + "-" + suits[i]);
-            
+            fetch('/table/add_card_to_hand', {
+                method:'POST', 
+                headers: {
+                    'Content-Type': 'application/json'
+                }, 
+                body: JSON.stringify({
+                    session_id: global_session_id,
+                    player_id: 1, // Update this later when login is done
+                    bet_amount: 0, // Update this later too
+                    is_winner: 0 // Add update_card endpoint when hand is done
+                })
+            })
         }
     }
 }

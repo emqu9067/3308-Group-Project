@@ -184,7 +184,7 @@ app.post('/table/add_hand', function(req, res) {
    var bet_amount = req.body.bet_amount;
    var is_winner = req.body.is_winner;
 
-   const query = `INSERT INTO hand (id, session_id, player_id, bet_amount, is_winner) VALUES (DEFAULT, '${session_id}', '${player_id}', '${bet_amount}', '${is_winner}');`
+   const query = `INSERT INTO hand (id, session_id, player_id, bet_amount, is_winner) VALUES (DEFAULT, '${session_id}', '${player_id}', '${bet_amount}', '${is_winner}') RETURNING id;`
 
    db.any(query)
 
@@ -193,7 +193,8 @@ app.post('/table/add_hand', function(req, res) {
       res.status(200).json({
          status: 'success',
          message: 'Added hand to database.',
-      })
+         hand_id: data.id
+      });
    })
    .catch(function(err){
       return console.log(err);
