@@ -20,7 +20,7 @@ window.onload = function()
     });
 }
 
-function begin_session()
+async function begin_session()
 {
     session = fetch('/table/begin_session', {
         method:'POST', 
@@ -30,6 +30,8 @@ function begin_session()
         body: JSON.stringify({player_id: 1})
     })
     // 2. Get the session id
+    await session;
+    
     session_id = new Promise((resolve, reject) => {
         get_session_id()
             .then(function(res) {
