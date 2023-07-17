@@ -6,6 +6,7 @@ const bodyParser = require('body-parser');
 const session = require('express-session');
 require('dotenv').config();
 app.set('views', path.join(__dirname, '/views'));
+
 // db config
 const dbConfig = {
   host: process.env.POSTGRES_HOST,
@@ -49,39 +50,43 @@ app.use(
 );
 
 const user = {
-  student_id: undefined,
   username: undefined,
-  first_name: undefined,
-  last_name: undefined,
   email: undefined,
-  year: undefined,
-  major: undefined,
-  degree: undefined,
+  chips: undefined,
 };
 
-app.post('/register_user', function(req, res) {
+app.post('/register_user', function(req, res){
 
    var username = req.body.username;
    var password = req.body.password;
    var email = req.body.email;
    var total_chips = 0;
 
-   const query = `INSERT INTO player (id, username, password, email, total_chips) VALUES (DEFAULT, '${username}', '${password}', '${email}', '${total_chips}');`
+   const query = `INSERT INTO player (id, username, password, email, total_chips) VALUES (DEFAULT, '${username}', '${password}', '${email}', '${total_chips}') returning * ;`
 
    db.any(query)
 
    .then(function(data)
    {
-     res.status(201).json({
-       status: 'success',
-       data: data,
-       message: 'Successfully registered user',
-     });
+
+     // res.status(201).json({
+     //   status: 'success',
+     //   data: data,
+     //   message: 'Successfully registered user',
+     // })
+      user.username = username;
+      user.email = email;
+      user.chips = total_chips;
+
+      req.session.user = user;
+      req.session.save();
+
+     res.redirect("/");
    })
    .catch(function(err){
      return console.log(err);
    });
-})
+});
 
 app.get("/login", (req, res) => {
   res.render('pages/login');
@@ -97,14 +102,9 @@ app.post("/login", (req, res) => {
   // get the student_id based on the emailid
   db.one(query, values)
     .then((data) => {
-      user.student_id = data.student_id;
       user.username = username;
-      user.first_name = data.first_name;
-      user.last_name = data.last_name;
       user.email = data.email;
-      user.year = data.year;
-      user.major = data.major;
-      user.degree = data.degree;
+      user.chips = data.total_chips;
 
       req.session.user = user;
       req.session.save();
@@ -128,14 +128,10 @@ const auth = (req, res, next) => {
 app.use(auth);
 
 app.get("/", (req, res) => {
-  res.render("pages/play", {
+  res.render("pages/home", {
     username: req.session.user.username,
-    first_name: req.session.user.first_name,
-    last_name: req.session.user.last_name,
     email: req.session.user.email,
-    year: req.session.user.year,
-    major: req.session.user.major,
-    degree: req.session.user.degree,
+    chips: req.session.user.chips,
   });
 });
 
@@ -144,6 +140,80 @@ app.get("/logout", (req, res) => {
   req.session.destroy();
   res.render("pages/logout");
 });
+
+
+
+
+
+
+
+app.get('/check_username', function(req, res) {
+
+   var username = req.query.username;
+
+   const query = `SELECT * FROM player WHERE username = '${username}';`
+
+      db.any(query)
+
+   .then(function(data)
+   {
+      if(data.length == 0)
+      {
+         res.status(200).json({
+            status: 'available',
+            message: 'Username is available.',
+            })
+      }
+      else{
+         res.status(200).json({
+         status: 'taken',
+         message: 'Username is taken.',
+         })
+      }
+   })
+
+   .catch(function(err){
+     return console.log(err);
+   });
+})
+
+app.get('/check_email', function(req, res) {
+
+   var email = req.query.email;
+
+   const query = `SELECT * FROM player WHERE email = '${email}';`
+
+      db.any(query)
+
+   .then(function(data)
+   {
+      if(data.length == 0)
+      {
+         res.status(200).json({
+            status: 'available',
+            message: 'Email is not used by an existing account.',
+            })
+      }
+      else{
+         res.status(200).json({
+         status: 'taken',
+         message: 'Email is used by an existing account.',
+         })
+      }
+   })
+
+   .catch(function(err){
+     return console.log(err);
+   });
+})
+
+
+
+
+
+
+
+
 
 app.listen(4000);
 console.log("Server is listening on port 4000");
