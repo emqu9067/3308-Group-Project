@@ -144,7 +144,12 @@ function hit()
 
     document.getElementById("player-sum").innerText = playerSum;
 
-    if (playerSum > 21) canHit = false;
+    if (playerSum > 21) 
+    {
+        canHit = false;
+        document.getElementById("hidden-card").src = "../../resources/img/cards/" + hiddenCard + ".svg";
+        finishHand();
+    }
 }
 
 function getValue(card)
@@ -166,3 +171,22 @@ function checkAce(card)
     if (card[0] == "A") return 1;
     return 0;
 }
+
+function newRound()
+{
+    document.getElementById("results").innerText = "";
+    document.getElementById("dealer-cards").innerHTML = '<img id="hidden-card" src="../../resources/img/cards/BACK.svg">';
+    document.getElementById("player-cards").innerHTML = '';
+
+    dealerSum = 0;
+    playerSum = 0;
+    dealerAces = 0;
+    playerAces = 0;
+    canHit = true;
+
+    createDeck();
+    shuffleDeck();
+    startHand();
+}
+
+document.getElementById("New_Round").addEventListener("click", newRound);
