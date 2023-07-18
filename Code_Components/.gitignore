@@ -4,3 +4,4 @@ src/node_modules
 .env
 src/.env
 /node_modules
+Code_Components/src/node_modules
