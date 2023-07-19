@@ -5,3 +5,4 @@ src/node_modules
 src/.env
 /node_modules
 Code_Components/src/node_modules
+./../.DS_Store
