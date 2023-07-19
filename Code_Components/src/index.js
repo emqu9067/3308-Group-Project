@@ -1,22 +1,18 @@
-// **************
-// Dependencies
-// **************
+// *****************************************************
+// <!-- Section 1 : Import Dependencies -->
+// *****************************************************
 
-const express = require('express');
-const bodyParser = require('body-parser');
-const pgp = require('pg-promise')();
-require('dotenv').config();
-
-const http = require('http');
-// **************
-// Initialization (copied from lab 7)
-// **************
-
-// defining the Express app
+const express = require('express'); 
 const app = express();
-// using bodyParser to parse JSON in the request body into JS objects
-app.use(bodyParser.json());
-// Database connection details
+const pgp = require('pg-promise')(); 
+const bodyParser = require('body-parser');
+const session = require('express-session'); 
+const bcrypt = require('bcrypt'); 
+
+// *****************************************************
+// <!-- Section 2 : Connect to DB -->
+// *****************************************************
+
 const dbConfig = {
   host: process.env.POSTGRES_HOST,
   port: 5432,
@@ -25,132 +21,122 @@ const dbConfig = {
   password: process.env.POSTGRES_PASSWORD,
   ssl: true
 };
-// Connect to database using the above details
+
 const db = pgp(dbConfig);
 
+db.connect()
+  .then(obj => {
+    console.log('Database connection successful'); 
+    obj.done(); 
+  })
+  .catch(error => {
+    console.log('ERROR:', error.message || error);
+  });
 
-const port = 4000;
-const baseUrl = `http://localhost:${port}`;
+// *****************************************************
+// <!-- Section 3 : App Settings -->
+// *****************************************************
 
+app.set('view engine', 'ejs'); 
+app.use(bodyParser.json()); 
+app.use(express.static(__dirname + '/')); 
 
-const homePage = `<!DOCTYPE html>
-   <html lang="en">
-   <head>
-      <meta charset="UTF-8">
-      <title>My Main Page</title>
-   </head>
-   <body>
-      <h1>My Main Page</h1>
-   </body>
-   </html>`;
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    saveUninitialized: false,
+    resave: false,
+  })
+);
 
+app.use(
+  bodyParser.urlencoded({
+    extended: true,
+  })
+);
 
-http.createServer(function (req, response) {
-   //console.log(req);
-   response.writeHead(200, {'Content-Type': 'text/html'});
+// *****************************************************
+// <!-- Section 4 : API Routes -->
+// *****************************************************
 
-
-   response.write(homePage);
-
-
-   response.end();
-})
-app.listen(port, '0.0.0.0');
-console.log('Server running at http://localhost:' + port);
-
-// **************
-// Endpoints
-// **************
-
-// Default
-
-// <!-- Endpoint 1 :  Default endpoint ("/") -->
-const message = 'Hello';
 app.get('/', (req, res) => {
-  res.send(message);
+  res.redirect('/login'); 
 });
 
-app.post('/register_user', function(req, res) {
+app.get('/login', (req, res) => {
+  res.render('pages/login');
+});
 
-   var username = req.body.username;
-   var password = req.body.password;
-   var email = req.body.email;
-   var total_chips = 0;
+app.get('/register', (req, res) => {
+  res.render('pages/register')
+});
 
-   const query = `INSERT INTO player (id, username, password, email, total_chips) VALUES (DEFAULT, '${username}', '${password}', '${email}', '${total_chips}');`
+app.post('/register', async (req, res) => {
+  const { username, email, password } = req.body;
 
-   db.any(query)
+  try 
+  {
+    const hash = await bcrypt.hash(password, 10);
 
-   .then(function(data)
-   {
-     res.status(201).json({
-       status: 'success',
-       data: data,
-       message: 'Successfully registered user',
-     });
-   })
+    let id = await db.one('INSERT INTO player (username, password, email, total_chips) VALUES ($1, $2, $3, $4) RETURNING id', [username, hash, email, 2000]);
 
-   .catch(function(err){
-     return console.log(err);
-   });
-})
+    res.redirect('/login');
 
-app.get('/check_username', function(req, res) {
+  } catch (error) 
+  {
+    res.redirect('/register');
+  }
 
-   var username = req.query.username;
+});
 
-   const query = `SELECT * FROM player WHERE username = '${username}';`
+app.post('/login', async (req, res) => {
+  const { username, password } = req.body;
+  try 
+  {
+    const player = await db.oneOrNone('SELECT * FROM player WHERE username = $1', username);
 
-      db.any(query)
+    if (!player) return res.redirect('/register');
 
-   .then(function(data)
-   {
-      if(data.length == 0)
-      {
-         res.status(200).json({
-            status: 'available',
-            message: 'Username is available.',
-            })
-      }
-      else{
-         res.status(200).json({
-         status: 'taken',
-         message: 'Username is taken.',
-         })
-      }
-   })
+    const passwordMatch = await bcrypt.compare(password, player.password);
 
-   .catch(function(err){
-     return console.log(err);
-   });
-})
+    if (!passwordMatch){throw new Error('Incorrect username or password.');}
 
-app.get('/check_email', function(req, res) {
+    req.session.user = player;
+    req.session.save();
 
-   var email = req.query.email;
+    res.redirect('/table');
 
-   const query = `SELECT * FROM player WHERE email = '${email}';`
+  } catch (error) 
+  {
+    res.render('pages/login', { message: 'Incorrect username or password.' });
+  }
+});
 
-      db.any(query)
+const auth = (req, res, next) => {
+  if (!req.session.user) {
+    return res.redirect('/login');
+  }
+  next();
+};
 
-   .then(function(data)
-   {
-      if(data.length == 0)
-      {
-         res.status(200).json({
-            status: 'available',
-            message: 'Email is not used by an existing account.',
-            })
-      }
-      else{
-         res.status(200).json({
-         status: 'taken',
-         message: 'Email is used by an existing account.',
-         })
-      }
-   })
+app.use(auth);
 
-   .catch(function(err){
-     return console.log(err);
-   });
-})
+app.get('/table', auth, (req, res) => {
+  res.render('pages/table'); 
+});
+
+app.get('/profile', auth, (req, res) => {
+  res.render('pages/profile'); 
+});
+
+app.get('/logout', (req, res) => {
+  req.session.destroy(); 
+  res.render('pages/login', { message: 'Logged out Successfully' });
+});
+
+// *****************************************************
+// <!-- Section 5 : Start Server-->
+// *****************************************************
+
+app.listen(4000);
+console.log('Server is listening on port 4000');

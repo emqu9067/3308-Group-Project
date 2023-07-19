@@ -45,12 +45,23 @@ function startHand()
     dealerSum += getValue(hiddenCard);
     dealerAces += checkAce(hiddenCard);
 
+    let cardImgHidden = document.createElement("img");
+    cardImgHidden.id = "hidden-card";
+    cardImgHidden.src = "../../resources/img/cards/BACK.svg"; 
+
+    let dealerCards = document.getElementById("dealer-cards");
+    dealerCards.innerHTML = ""; 
+
     let cardImg = document.createElement("img");
     let card = deck.pop();
     cardImg.src = "../../resources/img/cards/" + card + ".svg";
     dealerSum += getValue(card);
     dealerAces += checkAce(card);
-    document.getElementById("dealer-cards").append(cardImg);
+    dealerCards.append(cardImgHidden);
+    dealerCards.append(cardImg);
+
+    let playerCards = document.getElementById("player-cards");
+    playerCards.innerHTML = ""; 
 
     for (let i = 0; i < 2; i++)
     {
@@ -88,6 +99,9 @@ function stay()
 
     document.getElementById("hidden-card").src = "../../resources/img/cards/" + hiddenCard + ".svg";
 
+    let cardImgHidden = document.getElementById("hidden-card");
+    cardImgHidden.src = "../../resources/img/cards/" + hiddenCard + ".svg";
+   
     finishDealer();
     finishHand();
 }
@@ -123,6 +137,8 @@ function finishHand()
     document.getElementById("results").innerText = message;
     document.getElementById("dealer-sum").innerText = dealerSum;
     document.getElementById("player-sum").innerText = playerSum;
+
+    document.getElementById("play-again").style.display = "block";
 }
 
 function hit()
@@ -144,12 +160,7 @@ function hit()
 
     document.getElementById("player-sum").innerText = playerSum;
 
-    if (playerSum > 21) 
-    {
-        canHit = false;
-        document.getElementById("hidden-card").src = "../../resources/img/cards/" + hiddenCard + ".svg";
-        finishHand();
-    }
+    if (playerSum > 21) canHit = false;
 }
 
 function getValue(card)
@@ -172,21 +183,30 @@ function checkAce(card)
     return 0;
 }
 
-function newRound()
+function playAgain() 
 {
-    document.getElementById("results").innerText = "";
-    document.getElementById("dealer-cards").innerHTML = '<img id="hidden-card" src="../../resources/img/cards/BACK.svg">';
-    document.getElementById("player-cards").innerHTML = '';
-
     dealerSum = 0;
     playerSum = 0;
     dealerAces = 0;
     playerAces = 0;
+    hiddenCard = null;
+    deck = [];
     canHit = true;
-
+  
+    let cardImgHidden = document.getElementById("hidden-card");
+    cardImgHidden.src = "../../resources/img/cards/BACK.svg";  
+  
+    resetElements();
+  
     createDeck();
     shuffleDeck();
     startHand();
 }
 
-document.getElementById("New_Round").addEventListener("click", newRound);
+function resetElements() 
+{
+    document.getElementById("dealer-cards").innerHTML = "";
+    document.getElementById("player-cards").innerHTML = "";
+    document.getElementById("results").innerText = "";
+    document.getElementById("play-again").style.display = "none";
+}
