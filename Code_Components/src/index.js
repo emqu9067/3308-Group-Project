@@ -1,22 +1,13 @@
-// **************
-// Dependencies
-// **************
-
 const express = require('express');
-const bodyParser = require('body-parser');
-const pgp = require('pg-promise')();
-require('dotenv').config();
-
-const http = require('http');
-// **************
-// Initialization (copied from lab 7)
-// **************
-
-// defining the Express app
 const app = express();
-// using bodyParser to parse JSON in the request body into JS objects
-app.use(bodyParser.json());
-// Database connection details
+var path = require('path');
+const pgp = require('pg-promise')();
+const bodyParser = require('body-parser');
+const session = require('express-session');
+require('dotenv').config();
+app.set('views', path.join(__dirname, '/views'));
+
+// db config
 const dbConfig = {
   host: process.env.POSTGRES_HOST,
   port: 5432,
@@ -25,75 +16,136 @@ const dbConfig = {
   password: process.env.POSTGRES_PASSWORD,
   ssl: true
 };
-// Connect to database using the above details
+
 const db = pgp(dbConfig);
 
+// db test
+db.connect()
+  .then((obj) => {
+    // Can check the server version here (pg-promise v10.1.0+):
+    console.log("Database connection successful");
+    obj.done(); // success, release the connection;
+  })
+  .catch((error) => {
+    console.log("ERROR:", error.message || error);
+  });
 
-const port = 4000;
-const baseUrl = `http://localhost:${port}`;
+// set the view engine to ejs
+app.set("view engine", "ejs");
+app.use(bodyParser.json());
 
+// set session
+app.use(
+  session({
+    secret: "XASDASDA",
+    saveUninitialized: true,
+    resave: true,
+  })
+);
 
-const homePage = `<!DOCTYPE html>
-   <html lang="en">
-   <head>
-      <meta charset="UTF-8">
-      <title>My Main Page</title>
-   </head>
-   <body>
-      <h1>My Main Page</h1>
-   </body>
-   </html>`;
+app.use(
+  bodyParser.urlencoded({
+    extended: true,
+  })
+);
 
+const user = {
+  username: undefined,
+  email: undefined,
+  chips: undefined,
+};
 
-http.createServer(function (req, response) {
-   //console.log(req);
-   response.writeHead(200, {'Content-Type': 'text/html'});
-
-
-   response.write(homePage);
-
-
-   response.end();
-})
-app.listen(port, '0.0.0.0');
-console.log('Server running at http://localhost:' + port);
-
-// **************
-// Endpoints
-// **************
-
-// Default
-
-// <!-- Endpoint 1 :  Default endpoint ("/") -->
-const message = 'Hello';
-app.get('/', (req, res) => {
-  res.send(message);
-});
-
-app.post('/register_user', function(req, res) {
+app.post('/register_user', function(req, res){
 
    var username = req.body.username;
    var password = req.body.password;
    var email = req.body.email;
    var total_chips = 0;
 
-   const query = `INSERT INTO player (id, username, password, email, total_chips) VALUES (DEFAULT, '${username}', '${password}', '${email}', '${total_chips}');`
+   const query = `INSERT INTO player (id, username, password, email, total_chips) VALUES (DEFAULT, '${username}', '${password}', '${email}', '${total_chips}') returning * ;`
 
    db.any(query)
 
    .then(function(data)
    {
-     res.status(201).json({
-       status: 'success',
-       data: data,
-       message: 'Successfully registered user',
-     });
-   })
 
+     // res.status(201).json({
+     //   status: 'success',
+     //   data: data,
+     //   message: 'Successfully registered user',
+     // })
+      user.username = username;
+      user.email = email;
+      user.chips = total_chips;
+
+      req.session.user = user;
+      req.session.save();
+
+     res.redirect("/");
+   })
    .catch(function(err){
      return console.log(err);
    });
-})
+});
+
+app.get("/login", (req, res) => {
+  res.render('pages/login');
+});
+
+// Login submission
+app.post("/login", (req, res) => {
+  const email = req.body.email;
+  const username = req.body.username;
+  const query = "select * from player where player.email = $1";
+  const values = [email];
+
+  // get the student_id based on the emailid
+  db.one(query, values)
+    .then((data) => {
+      user.username = username;
+      user.email = data.email;
+      user.chips = data.total_chips;
+
+      req.session.user = user;
+      req.session.save();
+
+      res.redirect("/");
+    })
+    .catch((err) => {
+      console.log(err);
+      res.redirect("/login");
+    });
+});
+
+// Authentication middleware.
+const auth = (req, res, next) => {
+  if (!req.session.user) {
+    return res.redirect("/login");
+  }
+  next();
+};
+
+app.use(auth);
+
+app.get("/", (req, res) => {
+  res.render("pages/home", {
+    username: req.session.user.username,
+    email: req.session.user.email,
+    chips: req.session.user.chips,
+  });
+});
+
+
+app.get("/logout", (req, res) => {
+  req.session.destroy();
+  res.render("pages/logout");
+});
+
+
+
+
+
+
 
 app.get('/check_username', function(req, res) {
 
@@ -154,3 +206,14 @@ app.get('/check_email', function(req, res) {
      return console.log(err);
    });
 })
+
+
+
+
+
+
+
+
+
+app.listen(4000);
+console.log("Server is listening on port 4000");
