@@ -127,18 +127,6 @@ function createDeck()
         for (let j = 0; j < ranks.length; j++) 
         {
             deck.push(ranks[j] + "-" + suits[i]);
-            fetch('/table/add_card_to_hand', {
-                method:'POST', 
-                headers: {
-                    'Content-Type': 'application/json'
-                }, 
-                body: JSON.stringify({
-                    session_id: global_session_id,
-                    player_id: 1, // Update this later when login is done
-                    bet_amount: 0, // Update this later too
-                    is_winner: 0 // Add update_card endpoint when hand is done
-                })
-            })
         }
     }
 }
@@ -154,18 +142,72 @@ function shuffleDeck()
     }
 }
 
-function startHand()
+async function startHand()
 {
+    hand_id = await new Promise((resolve, reject) => {
+        fetch('/table/add_hand', {
+            method:'POST', 
+            headers: {
+                'Content-Type': 'application/json'
+            }, 
+            body: JSON.stringify({
+                session_id: global_session_id,
+                player_id: 1, // Update this later when login is done
+                bet_amount: 0, // Update this later too
+                is_winner: 0 // Add update_card endpoint when hand is done
+            })
+        })
+        .then(function(data)
+        {
+            return data.json()
+        })
+        .then(function(data)
+        {
+            console.log(data);
+            resolve(data.hand_id);
+        })
+    });
+
+    console.log(hand_id)
+
     hiddenCard = deck.pop();
     dealerSum += getValue(hiddenCard);
     dealerAces += checkAce(hiddenCard);
 
+    // Add the dealer's hidden card to the hand
+    fetch('/table/add_card_to_hand', {
+        method:'POST', 
+        headers: {
+            'Content-Type': 'application/json'
+        }, 
+        body: JSON.stringify({
+            hand_id: hand_id,
+            suit: hiddenCard[2], // Update this later when login is done
+            rank: hiddenCard[0], // Update this later too
+            dealer_hand: 1 // Add update_card endpoint when hand is done
+        })
+    })
+
     let cardImg = document.createElement("img");
     let card = deck.pop();
-    cardImg.src = "/img/cards/" + card + ".svg";
+    cardImg.src = "../img/cards/" + card + ".svg";
     dealerSum += getValue(card);
     dealerAces += checkAce(card);
     document.getElementById("dealer-cards").append(cardImg);
+
+    // Add the dealer's visible card to the hand
+    fetch('/table/add_card_to_hand', {
+        method:'POST', 
+        headers: {
+            'Content-Type': 'application/json'
+        }, 
+        body: JSON.stringify({
+            hand_id: hand_id,
+            suit: card[2], // Update this later when login is done
+            rank: card[0], // Update this later too
+            dealer_hand: 1 // Add update_card endpoint when hand is done
+        })
+    })
 
     for (let i = 0; i < 2; i++)
     {
@@ -175,6 +217,19 @@ function startHand()
         playerSum += getValue(card);
         playerAces += checkAce(card);
         document.getElementById("player-cards").append(cardImg);
+
+        fetch('/table/add_card_to_hand', {
+            method:'POST', 
+            headers: {
+                'Content-Type': 'application/json'
+            }, 
+            body: JSON.stringify({
+                hand_id: hand_id,
+                suit: card[2], // Update this later when login is done
+                rank: card[0], // Update this later too
+                dealer_hand: 0 // Add update_card endpoint when hand is done
+            })
+        })
     }
 
     if (playerSum == 21 || dealerSum == 21) 
@@ -217,6 +272,19 @@ function finishDealer()
         dealerSum += getValue(card);
         dealerAces += checkAce(card);
         document.getElementById("dealer-cards").append(cardImg);
+
+        fetch('/table/add_card_to_hand', {
+            method:'POST', 
+            headers: {
+                'Content-Type': 'application/json'
+            }, 
+            body: JSON.stringify({
+                hand_id: hand_id,
+                suit: card[2], // Update this later when login is done
+                rank: card[0], // Update this later too
+                dealer_hand: 1 // Add update_card endpoint when hand is done
+            })
+        })
         
         while (dealerSum > 21 && dealerAces > 0)
         {
@@ -250,6 +318,19 @@ function hit()
     playerSum += getValue(card);
     playerAces += checkAce(card);
     document.getElementById("player-cards").append(cardImg);
+
+    fetch('/table/add_card_to_hand', {
+        method:'POST', 
+        headers: {
+            'Content-Type': 'application/json'
+        }, 
+        body: JSON.stringify({
+            hand_id: hand_id,
+            suit: card[2], // Update this later when login is done
+            rank: card[0], // Update this later too
+            dealer_hand: 0 // Add update_card endpoint when hand is done
+        })
+    })
 
     while (playerSum > 21 && playerAces > 0)
     {

@@ -180,7 +180,7 @@ app.post('/table/add_card_to_hand', function(req, res) {
 
 app.post('/table/add_hand', function(req, res) {
    var session_id = req.body.session_id;
-   var player_id = req.body.player_id;
+   var player_id = req.body.player_id; // Change this to req.session.user; after login is merged
    var bet_amount = req.body.bet_amount;
    var is_winner = req.body.is_winner;
 
@@ -190,10 +190,11 @@ app.post('/table/add_hand', function(req, res) {
 
    .then(function(data)
    {
+    console.log(data);
       res.status(200).json({
-         status: 'success',
+         status: 'OK',
          message: 'Added hand to database.',
-         hand_id: data.id
+         hand_id: data[0].id
       });
    })
    .catch(function(err){
