@@ -104,7 +104,7 @@ app.post('/login', async (req, res) => {
     req.session.user = player;
     req.session.save();
 
-    res.redirect('/table');
+    res.redirect('/profile');
 
   } catch (error) 
   {
@@ -126,7 +126,11 @@ app.get('/table', auth, (req, res) => {
 });
 
 app.get('/profile', auth, (req, res) => {
-  res.render('pages/profile'); 
+  res.render('pages/profile',{
+    user:req.session.user.username,
+    contact:req.session.user.email,
+    tokens:req.session.user.total_chips,
+  }); 
 });
 
 app.get('/logout', (req, res) => {
