@@ -160,12 +160,12 @@ function hit()
 
     document.getElementById("player-sum").innerText = playerSum;
 
-    if (playerSum > 21) 
+    if (playerSum > 21)
     {
         canHit = false;
         document.getElementById("hidden-card").src = "../../resources/img/cards/" + hiddenCard + ".svg";
         finishHand();
-    }
+    } 
 }
 
 function getValue(card)

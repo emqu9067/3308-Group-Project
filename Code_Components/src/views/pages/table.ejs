@@ -23,6 +23,15 @@
         <script>
           document.getElementById("play-again").addEventListener("click", playAgain);
         </script>
+        <script>
+          window.addEventListener('beforeunload', function () 
+          {
+            var closeTab = new XMLHttpRequest();
+            closeTab.open('POST', '/update-end-time', true);
+            closeTab.setRequestHeader('Content-Type', 'application/json');
+            closeTab.send(JSON.stringify({ sessionId: '<%= session.sessionId %>' }));
+          });
+        </script>
   </div>
 </main>
 

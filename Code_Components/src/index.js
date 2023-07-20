@@ -8,6 +8,8 @@ const pgp = require('pg-promise')();
 const bodyParser = require('body-parser');
 const session = require('express-session'); 
 const bcrypt = require('bcrypt'); 
+const moment = require('moment');
+const http = require('http');
 
 // *****************************************************
 // <!-- Section 2 : Connect to DB -->
@@ -60,15 +62,15 @@ app.use(
 // *****************************************************
 
 app.get('/', (req, res) => {
-  res.redirect('/login'); 
+  res.redirect('/login', { session: req.session }); 
 });
 
 app.get('/login', (req, res) => {
-  res.render('pages/login');
+  res.render('pages/login', { session: req.session });
 });
 
 app.get('/register', (req, res) => {
-  res.render('pages/register')
+  res.render('pages/register', { session: req.session })
 });
 
 app.post('/register', async (req, res) => {
@@ -121,22 +123,62 @@ const auth = (req, res, next) => {
 
 app.use(auth);
 
-app.get('/table', auth, (req, res) => {
-  res.render('pages/table'); 
+app.get('/table', auth, async (req, res) => {
+  try {
+    // Check if the user has an active session
+    if (req.session.sessionId) {
+      // Update the end_time of the existing session
+      const endTime = moment().format();
+      await db.none('UPDATE session SET end_time = $1 WHERE id = $2', [endTime, req.session.sessionId]);
+    } else {
+      // Insert a new session entry
+      const startTime = moment().format();
+      const result = await db.one('INSERT INTO session (player_id, start_time) VALUES ($1, $2) RETURNING id', [req.session.user.id, startTime]);
+      req.session.sessionId = result.id; // Store the session ID in the session object
+    }
+
+    res.render('pages/table', { session: req.session });
+  } catch (error) {
+    console.log('Error:', error);
+    res.redirect('/login');
+  }
 });
 
 app.get('/profile', auth, (req, res) => {
-  res.render('pages/profile'); 
+  res.render('pages/profile', { session: req.session }); 
 });
 
-app.get('/logout', (req, res) => {
-  req.session.destroy(); 
-  res.render('pages/login', { message: 'Logged out Successfully' });
+app.get('/logout', async (req, res) => {
+  try {
+    // Update the end_time of the active session
+    if (req.session.sessionId) {
+      const endTime = moment().format();
+      await db.none('UPDATE session SET end_time = $1 WHERE id = $2', [endTime, req.session.sessionId]);
+    }
+
+    req.session.destroy();
+    res.render('pages/login', { message: 'Logged out Successfully' , session: req.session });
+  } catch (error) {
+    console.log('Error:', error);
+    res.redirect('/login');
+  }
+});
+
+app.post('/update-end-time', async (req, res) => {
+  try {
+    const { sessionId } = req.body;
+    const endTime = moment().format();
+    await db.none('UPDATE session SET end_time = $1 WHERE id = $2', [endTime, sessionId]);
+    res.sendStatus(200);
+  } catch (error) {
+    console.log('Error:', error);
+    res.sendStatus(500);
+  }
 });
 
 // *****************************************************
-// <!-- Section 5 : Start Server-->
+// <!-- Section 5 : Start Server-->  
 // *****************************************************
 
 app.listen(4000);
-console.log('Server is listening on port 4000');
+console.log('Server is listening on port 4000'); 

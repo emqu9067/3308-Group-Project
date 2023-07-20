@@ -1,5 +1,8 @@
 <%- include ('../partials/head') %>
-<%- include ('../partials/menu') %>
+<% if (typeof session !== 'undefined') { %>
+  <%- include ('../partials/menu') %>
+<% } %>
+
 <main>
   <div class="col"><%- include ('../partials/message') %></div>
   <div class="container">
