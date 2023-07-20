@@ -6,11 +6,115 @@ var hiddenCard;
 var deck;
 var canHit = true;
 
+// Documenting everything I've done today (7/16) because it's a real clusterfuck and I know I won't remember how it works if I don't do this now
+
+// Global variable so we don't have to fuck around with parameters for every function or whatever
+// (Now that I think about it the way I've implemented it we wouldn't need that but w h a t e v e r)
+let global_session_id;
+
+// On loading the window, this calls the begin_session function, which calls the get_session_id function (may be unnecessary, may fix)
 window.onload = function() 
 {
+        // Call the begin_session() function, which returns an integer.
+        session = begin_session()
+        // 3. Begin the game
+        .then(function(session_id){
+            // This console.log is for debugging. Sometimes it doesn't pass the session id??
+            console.log(session_id);
+            // Save it to the global session id variable
+            global_session_id = session_id;
+            
+            // Now that this is done, start the game. 
+            //This is within the .then() method because update_session() must activate after this.
+            begin_game();
+        });
+    }
+    
+    // begin_session function. This is async because it needs to wait for the fetch() command within it
+    // (.then() wasn't really working right, I couldn't quite figure out how to resolve things properly)
+    async function begin_session()
+    {
+        // Call the begin_session endpoint, which does not return anything
+        // (This may change later)
+        session = fetch('/table/begin_session', {
+            method:'POST', 
+            headers: {
+                'Content-Type': 'application/json'
+            }, 
+            body: JSON.stringify({player_id: 1})
+        })
+        // Wait for this above Promise to resolve.
+        await session;
+    
+        // Now set up session_id as a Promise, which will call the get_session_id() function
+        session_id = new Promise((resolve, reject) => {
+            get_session_id()
+                // If get_session_id returns a valid number, then resolve the session_id Promise as that
+                .then(function(res) {
+                    resolve(res)
+                })
+                // Otherwise, set it as the error
+                .catch(function(err) {
+                console.log(err);
+                reject(err)
+                })
+          })
+    
+        // Return the (hopefully) resolved session_id
+          return session_id;
+    }
+    
+    // This function is also async for similar reasons.
+    async function get_session_id()
+    {
+        // Set up a Promise which requests the get_curren_session endpoint
+        response = new Promise((resolve, reject) => {
+            fetch('/table/get_current_session?player_id=1') // Change this when the login thing is working
+                // This returns a Promise, so you have to have this here to convert it to a JSON.
+                .then(function(data)
+                {
+                    return data.json();
+                })
+                // Then resolve the Promise with the proper session id
+                .then(function(data) {
+                    resolve(data.session_id);
+                })
+                // Otherwise, set reject the Promise as the error
+                .catch(function(err)
+                {
+                    console.log(err);
+                    reject("Error");
+                })
+        })
+    
+        // Wait for the above Promise to resolve
+        await response;
+    
+        // Return the (hopefully) resolved session id.
+        return response;
+    }
+    
+    // Async because the begin_session stuff has to activate first.
+    async function begin_game()
+    {
+        await global_session_id; 
+        update_session(global_session_id);
+    
     createDeck();
     shuffleDeck();
     startHand();
+}
+
+function update_session()
+{
+    // console.log(session_id)
+    fetch('/table/update_session', {
+        method:'POST', 
+        headers: {
+            'Content-Type': 'application/json'
+        }, 
+        body: JSON.stringify({session_id: global_session_id})
+    })
 }
 
 function createDeck() 
@@ -39,11 +143,52 @@ function shuffleDeck()
     }
 }
 
-function startHand()
-{
+async function startHand()
+{    
+    hand_id = await new Promise((resolve, reject) => {
+        fetch('/table/add_hand', {
+            method:'POST', 
+            headers: {
+                'Content-Type': 'application/json'
+            }, 
+            body: JSON.stringify({
+                session_id: global_session_id,
+                player_id: 1, // Update this later when login is done
+                bet_amount: 0, // Update this later too
+                is_winner: 0 // Add update_card endpoint when hand is done
+            })
+        })
+        .then(function(data)
+        {
+            return data.json()
+        })
+        .then(function(data)
+        {
+            console.log(data);
+            resolve(data.hand_id);
+        })
+    });
+
+    console.log(hand_id)
+
     hiddenCard = deck.pop();
     dealerSum += getValue(hiddenCard);
     dealerAces += checkAce(hiddenCard);
+
+        // Add the dealer's hidden card to the hand
+        fetch('/table/add_card_to_hand', {
+            method:'POST', 
+            headers: {
+                'Content-Type': 'application/json'
+            }, 
+            body: JSON.stringify({
+                hand_id: hand_id,
+                suit: hiddenCard[2], // Update this later when login is done
+                rank: hiddenCard[0], // Update this later too
+                dealer_hand: 1 // Add update_card endpoint when hand is done
+            })
+        })
+    
 
     let cardImgHidden = document.createElement("img");
     cardImgHidden.id = "hidden-card";
@@ -59,6 +204,19 @@ function startHand()
     dealerAces += checkAce(card);
     dealerCards.append(cardImgHidden);
     dealerCards.append(cardImg);
+        // Add the dealer's visible card to the hand
+        fetch('/table/add_card_to_hand', {
+            method:'POST', 
+            headers: {
+                'Content-Type': 'application/json'
+            }, 
+            body: JSON.stringify({
+                hand_id: hand_id,
+                suit: card[2], // Update this later when login is done
+                rank: card[0], // Update this later too
+                dealer_hand: 1 // Add update_card endpoint when hand is done
+            })
+        })
 
     let playerCards = document.getElementById("player-cards");
     playerCards.innerHTML = ""; 
@@ -71,9 +229,28 @@ function startHand()
         playerSum += getValue(card);
         playerAces += checkAce(card);
         document.getElementById("player-cards").append(cardImg);
+        
+        fetch('/table/add_card_to_hand', {
+            method:'POST', 
+            headers: {
+                'Content-Type': 'application/json'
+            }, 
+            body: JSON.stringify({
+                hand_id: hand_id,
+                suit: card[2], // Update this later when login is done
+                rank: card[0], // Update this later too
+                dealer_hand: 0 // Add update_card endpoint when hand is done
+            })
+        })
     }
 
-    if (playerSum == 21 || dealerSum == 21) 
+    while (playerSum > 21 && playerAces > 0)
+    {
+        playerSum -= 10;
+        playerAces -= 1;
+    }
+
+    if (playerSum >= 21 || dealerSum >= 21) 
     {
         document.getElementById("hidden-card").src = "../../resources/img/cards/" + hiddenCard + ".svg";
         canHit = false;
@@ -116,6 +293,19 @@ function finishDealer()
         dealerSum += getValue(card);
         dealerAces += checkAce(card);
         document.getElementById("dealer-cards").append(cardImg);
+
+        fetch('/table/add_card_to_hand', {
+            method:'POST', 
+            headers: {
+                'Content-Type': 'application/json'
+            }, 
+            body: JSON.stringify({
+                hand_id: hand_id,
+                suit: card[2], // Update this later when login is done
+                rank: card[0], // Update this later too
+                dealer_hand: 1 // Add update_card endpoint when hand is done
+            })
+        })
         
         while (dealerSum > 21 && dealerAces > 0)
         {
@@ -129,9 +319,37 @@ function finishHand()
 {
     let message = "";
     if (playerSum > 21) message = "You Lose!";
-    else if (dealerSum > 21) message = "You Win!";
+    else if (dealerSum > 21)
+    {
+        fetch('/table/update_winner', {
+            method:'POST', 
+            headers: {
+                'Content-Type': 'application/json'
+            }, 
+            body: JSON.stringify({
+                hand_id: hand_id
+            })
+        })
+        message = "You Win!";
+    }
+
+
+
     else if (playerSum == dealerSum) message = "It's A Tie!";
-    else if (playerSum > dealerSum) message = "You Win!";
+    else if (playerSum > dealerSum)
+    {
+        fetch('/table/update_winner', {
+            method:'POST', 
+            headers: {
+                'Content-Type': 'application/json'
+            }, 
+            body: JSON.stringify({
+                hand_id: hand_id
+            })
+        })
+        
+        message = "You Win!";
+    }
     else message = "You Lose!";
 
     document.getElementById("results").innerText = message;
@@ -151,6 +369,19 @@ function hit()
     playerSum += getValue(card);
     playerAces += checkAce(card);
     document.getElementById("player-cards").append(cardImg);
+
+    fetch('/table/add_card_to_hand', {
+        method:'POST', 
+        headers: {
+            'Content-Type': 'application/json'
+        }, 
+        body: JSON.stringify({
+            hand_id: hand_id,
+            suit: card[2], // Update this later when login is done
+            rank: card[0], // Update this later too
+            dealer_hand: 0 // Add update_card endpoint when hand is done
+        })
+    })
 
     while (playerSum > 21 && playerAces > 0)
     {
