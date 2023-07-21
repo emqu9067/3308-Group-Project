@@ -114,13 +114,15 @@ function finishDealer()
 function finishHand()
 {
     let message = "";
-    if (playerSum > 21) message = "You Lose!";
-    else if (dealerSum > 21) message = "You Win!";
-    else if (playerSum == dealerSum) message = "It's A Tie!";
-    else if (playerSum > dealerSum) message = "You Win!";
-    else message = "You Lose!";
+    var valu;
+    if (playerSum > 21) {message = "You Lose!"; valu=0;}
+    else if (dealerSum > 21) {message = "You Win!"; valu=1;}
+    else if (playerSum == dealerSum) {message = "It's A Tie!"; valu=2;}
+    else if (playerSum > dealerSum) {message = "You Win!"; valu=1;}
+    else { message = "You Lose!"; valu=0; }
 
     document.getElementById("results").innerText = message;
+    document.getElementById("betResult").innerText = valu;
     document.getElementById("dealer-sum").innerText = dealerSum;
     document.getElementById("player-sum").innerText = playerSum;
 }

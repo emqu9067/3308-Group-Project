@@ -122,7 +122,14 @@ const auth = (req, res, next) => {
 app.use(auth);
 
 app.get('/table', auth, (req, res) => {
-  res.render('pages/table'); 
+  const bet = parseInt(req.query.betAmount);
+  console.log(bet);
+  res.render('pages/game',{
+    user:req.session.user.username,
+    contact:req.session.user.email,
+    tokens:req.session.user.total_chips,
+    bet:bet,
+  }); 
 });
 
 app.get('/profile', auth, (req, res) => {
@@ -131,6 +138,33 @@ app.get('/profile', auth, (req, res) => {
     contact:req.session.user.email,
     tokens:req.session.user.total_chips,
   }); 
+});
+
+app.get('/add500',auth, (req,res) => {
+  const tok = req.query.tok;
+  const uname = req.session.user.username;
+  console.log(tok);
+  const query = `update player set total_chips = ${tok} where username= '${uname}';`;
+  db.none(query)
+  req.session.user.total_chips = tok ;
+  res.redirect('/profile');
+
+});
+
+app.get('/update_tokens',auth,(req,res)=>{
+  const result = req.query.resVal;
+  const amount = req.query.finalAmount;
+  console.log(amount);
+  console.log(result);
+  res.redirect('/profile');
+});
+
+app.get('/bet',auth,(req,res)=>{
+  res.render('pages/bettingPage',{
+    user:req.session.user.username,
+    contact:req.session.user.email,
+    tokens:req.session.user.total_chips,
+  });
 });
 
 app.get('/logout', (req, res) => {

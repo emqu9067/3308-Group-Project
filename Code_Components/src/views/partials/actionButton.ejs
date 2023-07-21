@@ -1,0 +1,20 @@
+ <% if (parseInt(tokens)<500){ %>
+    <form action="/add500" method="GET">
+      <button><input
+        type="hidden"
+        type="submit" 
+        value="<%- parseInt(tokens)+parseInt(500) %>" 
+        name="tok"/>Add500
+      </button>
+    </form>
+  <p> Must have at least 500 tokens to play. Click Add500 to add tokens.</p>
+<% } else {  %>
+    <form action="/bet" method="GET">
+      <button><input
+        type="hidden"
+        type="submit" 
+        value="<%- parseInt(tokens) %>" 
+        name="tok"/>Play
+      </button>
+    </form>
+<% } %> 
