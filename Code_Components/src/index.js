@@ -152,9 +152,7 @@ app.get('/add500',auth, (req,res) => {
 });
 
 app.get('/update_tokens',auth,(req,res)=>{
-  const result = req.query.resVal;
-  const amount = req.query.finalAmount;
-  console.log(amount);
+  const result = req.query.tok;
   console.log(result);
   res.redirect('/profile');
 });

@@ -9,7 +9,10 @@
       <b>You placed a bet of:</b>
       <p><%= bet %></p>
       <p id="results"></p>
-      <value id="betResult" type="number"></value>
+      <form action="/update_tokens" method="GET">
+        <input id="betResult" name="tok" type="submit" type="hidden"/>
+      </form>
+      
     </div>
     <div class="col-7">
       <%- include('../partials/table') %>

@@ -122,7 +122,7 @@ function finishHand()
     else { message = "You Lose!"; valu=0; }
 
     document.getElementById("results").innerText = message;
-    document.getElementById("betResult").innerText = valu;
+    document.getElementById("betResult").value = valu;
     document.getElementById("dealer-sum").innerText = dealerSum;
     document.getElementById("player-sum").innerText = playerSum;
 }
