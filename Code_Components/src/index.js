@@ -123,7 +123,7 @@ app.use(auth);
 
 app.get('/table', auth, (req, res) => {
   const bet = parseInt(req.query.betAmount);
-  console.log(bet);
+  console.log("bet is:",bet);
   res.render('pages/game',{
     user:req.session.user.username,
     contact:req.session.user.email,
@@ -143,7 +143,6 @@ app.get('/profile', auth, (req, res) => {
 app.get('/add500',auth, (req,res) => {
   const tok = req.query.tok;
   const uname = req.session.user.username;
-  console.log(tok);
   const query = `update player set total_chips = ${tok} where username= '${uname}';`;
   db.none(query)
   req.session.user.total_chips = tok ;
@@ -152,9 +151,20 @@ app.get('/add500',auth, (req,res) => {
 });
 
 app.get('/update_tokens',auth,(req,res)=>{
-  const result = req.query.tok;
-  console.log(result);
-  res.redirect('/profile');
+  var tokenz = parseInt(req.query.tokenz);
+  var bet = parseInt(req.query.bet);
+  var sign = req.query.sign;
+  if(sign==0){tokenz=tokenz-bet};
+  if(sign==1){tokenz=tokenz+bet};
+  const uname=req.session.user.username;
+  const query=`update player set total_chips = ${tokenz} where username='${uname}'`;
+  db.none(query)
+  req.session.user.total_chips = tokenz;
+  console.log(tokenz,bet,sign);
+  if(tokenz<500){
+    res.redirect('/profile');
+  }
+  else(res.redirect('/bet'))
 });
 
 app.get('/bet',auth,(req,res)=>{

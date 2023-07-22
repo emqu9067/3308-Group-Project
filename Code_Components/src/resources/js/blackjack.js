@@ -121,10 +121,13 @@ function finishHand()
     else if (playerSum > dealerSum) {message = "You Win!"; valu=1;}
     else { message = "You Lose!"; valu=0; }
 
+
     document.getElementById("results").innerText = message;
-    document.getElementById("betResult").value = valu;
     document.getElementById("dealer-sum").innerText = dealerSum;
     document.getElementById("player-sum").innerText = playerSum;
+    document.getElementById("eResult").value = valu ;
+    document.getElementById("fResult").style.display="block";
+
 }
 
 function hit()

@@ -7,12 +7,19 @@
     <div class="col-3">
       <%- include('../partials/userinfo') %>
       <b>You placed a bet of:</b>
-      <p><%= bet %></p>
+      <p id="bet" type="number" value="<%- bet %>"><%= bet %></p>
       <p id="results"></p>
+
       <form action="/update_tokens" method="GET">
-        <input id="betResult" name="tok" type="submit" type="hidden"/>
+        <button id="fResult" style="display: none;">
+          <input type="hidden" type="number" id="eResult" name="sign"/>
+          <input type="hidden" type="number" name="tokenz" value="<%-parseInt(tokens)%>"/>
+          <input type="hidden" type="number" name="bet" value="<%-bet%>"/>OK
+        </button>
       </form>
-      
+
+        
+      <script src="../../resources/js/blackjack.js"></script>
     </div>
     <div class="col-7">
       <%- include('../partials/table') %>
