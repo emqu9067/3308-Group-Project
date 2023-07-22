@@ -200,6 +200,8 @@ function playAgain()
   
     let cardImgHidden = document.getElementById("hidden-card");
     cardImgHidden.src = "../../resources/img/cards/BACK.svg";  
+
+    document.getElementById("dealer-sum").innerText = "";
   
     resetElements();
   
