@@ -36,13 +36,7 @@ window.onload = function()
     {
         // Call the begin_session endpoint, which does not return anything
         // (This may change later)
-        session = fetch('/table/begin_session', {
-            method:'POST', 
-            headers: {
-                'Content-Type': 'application/json'
-            }, 
-            body: JSON.stringify({player_id: 1})
-        })
+        session = fetch('/table/begin_session', {method:'POST'})
         // Wait for this above Promise to resolve.
         await session;
     
@@ -69,7 +63,7 @@ window.onload = function()
     {
         // Set up a Promise which requests the get_curren_session endpoint
         response = new Promise((resolve, reject) => {
-            fetch('/table/get_current_session?player_id=1') // Change this when the login thing is working
+            fetch('/table/get_current_session') // Change this when the login thing is working
                 // This returns a Promise, so you have to have this here to convert it to a JSON.
                 .then(function(data)
                 {
@@ -153,7 +147,6 @@ async function startHand()
             }, 
             body: JSON.stringify({
                 session_id: global_session_id,
-                player_id: 1, // Update this later when login is done
                 bet_amount: 0, // Update this later too
                 is_winner: 0 // Add update_card endpoint when hand is done
             })

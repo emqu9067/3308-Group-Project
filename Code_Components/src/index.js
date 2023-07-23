@@ -215,7 +215,7 @@ Table APIs below
 ------------*/
 
 app.post('/table/begin_session', function(req, res) {
-  var player_id = req.body.player_id;
+  var player_id = req.session.user.id;
   var start_time = new Date(Date.now()).toISOString();
 
   const query = `INSERT INTO session (id, player_id, start_time, end_time) VALUES (DEFAULT, '${player_id}', '${start_time}', NULL);`
@@ -237,7 +237,7 @@ app.post('/table/begin_session', function(req, res) {
 
 app.get('/table/get_current_session', function(req, res)
 {
-   var player_id = req.query.player_id;
+   var player_id = req.session.user.id;
 
    const query = `SELECT * FROM session WHERE player_id = ${player_id} AND end_time IS NULL;`
    console.log(query);
@@ -277,7 +277,7 @@ app.post('/table/update_session', function(req, res) {
 
 app.post('/table/add_hand', function(req, res) {
   var session_id = req.body.session_id;
-  var player_id = req.body.player_id;
+  var player_id = req.session.user.id;
   var bet_amount = req.body.bet_amount;
   var is_winner = req.body.is_winner;
 
