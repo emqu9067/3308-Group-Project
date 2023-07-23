@@ -153,6 +153,7 @@ app.get('/add500',auth, (req,res) => {
 app.get('/update_tokens',auth,(req,res)=>{
   var tokenz = parseInt(req.query.tokenz);
   var bet = parseInt(req.query.bet);
+  var page = parseInt(req.query.acchion);
   var sign = req.query.sign;
   if(sign==0){tokenz=tokenz-bet};
   if(sign==1){tokenz=tokenz+bet};
@@ -160,11 +161,11 @@ app.get('/update_tokens',auth,(req,res)=>{
   const query=`update player set total_chips = ${tokenz} where username='${uname}'`;
   db.none(query)
   req.session.user.total_chips = tokenz;
-  console.log(tokenz,bet,sign);
-  if(tokenz<500){
-    res.redirect('/profile');
+  console.log("total:",tokenz,"bet:",bet,"math",sign,"page:",page);
+  if(tokenz>500 && page==3){
+    res.redirect('/bet');
   }
-  else(res.redirect('/bet'))
+  else(res.redirect('/profile'))
 });
 
 app.get('/bet',auth,(req,res)=>{
