@@ -104,7 +104,7 @@ app.post('/login', async (req, res) => {
     req.session.user = player;
     req.session.save();
 
-    res.redirect('/table');
+    res.redirect('/profile');
 
   } catch (error) 
   {
@@ -122,11 +122,58 @@ const auth = (req, res, next) => {
 app.use(auth);
 
 app.get('/table', auth, (req, res) => {
-  res.render('pages/table'); 
+  const bet = parseInt(req.query.betAmount);
+  console.log("bet is:",bet);
+  res.render('pages/game',{
+    user:req.session.user.username,
+    contact:req.session.user.email,
+    tokens:req.session.user.total_chips,
+    bet:bet,
+  }); 
 });
 
 app.get('/profile', auth, (req, res) => {
-  res.render('pages/profile'); 
+  res.render('pages/profile',{
+    user:req.session.user.username,
+    contact:req.session.user.email,
+    tokens:req.session.user.total_chips,
+  }); 
+});
+
+app.get('/add500',auth, (req,res) => {
+  const tok = req.query.tok;
+  const uname = req.session.user.username;
+  const query = `update player set total_chips = ${tok} where username= '${uname}';`;
+  db.none(query)
+  req.session.user.total_chips = tok ;
+  res.redirect('/profile');
+
+});
+
+app.get('/update_tokens',auth,(req,res)=>{
+  var tokenz = parseInt(req.query.tokenz);
+  var bet = parseInt(req.query.bet);
+  var page = parseInt(req.query.acchion);
+  var sign = req.query.sign;
+  if(sign==0){tokenz=tokenz-bet};
+  if(sign==1){tokenz=tokenz+bet};
+  const uname=req.session.user.username;
+  const query=`update player set total_chips = ${tokenz} where username='${uname}'`;
+  db.none(query)
+  req.session.user.total_chips = tokenz;
+  console.log("total:",tokenz,"bet:",bet,"math",sign,"page:",page);
+  if(tokenz>500 && page==3){
+    res.redirect('/bet');
+  }
+  else(res.redirect('/profile'))
+});
+
+app.get('/bet',auth,(req,res)=>{
+  res.render('pages/bettingPage',{
+    user:req.session.user.username,
+    contact:req.session.user.email,
+    tokens:req.session.user.total_chips,
+  });
 });
 
 app.get('/logout', (req, res) => {

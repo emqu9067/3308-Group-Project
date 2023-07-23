@@ -1,0 +1,45 @@
+<%- include ('../partials/head') %>
+<%- include ('../partials/menu') %>
+<%- include ('../partials/message') %>
+
+
+<div class="container text-center">
+  <div class="row">
+    <div class="col-3">
+      <%- include('../partials/userinfo') %>
+
+
+      <div class="card border-secondary text-center my-3" style="max-width: 18rem">
+        <div class="card-body">
+          <b>You placed a bet of:</b>
+          <div id="bet" type="number" value="<%- bet %>"><%= bet %> tokens</div>
+        </div>
+      </div>
+
+      
+
+      <div class="card border-secondary text-center" style="display:none;max-width:18rem" id="fResult" >
+        <b><div class="card-header text-center" id="results"></div></b>
+          <div class="card-body">
+          <div class="container">
+          
+            <form action="/update_tokens" method="GET">
+              <input type="hidden" type="number" id="eResult" name="sign"/>
+              <input type="hidden" type="number" name="tokenz" value="<%-parseInt(tokens)%>"/>
+              <input type="hidden" type="number" name="bet" value="<%-bet%>"/>
+              <div><button class="btn btn-success" type="number" name="acchion" value="3">PlayAgain</button></div>
+              <div><button class="btn btn-danger" type="number" name="acchion" value="4">EndGame</button></div>
+            </form>
+          </div>
+          </div>
+      </div>
+        
+      <script src="../../resources/js/blackjack.js"></script>
+    </div>
+    <div class="col-7">
+      <%- include('../partials/table') %>
+    </div>
+  </div>
+</div>
+
+<%- include ('../partials/footer') %>
