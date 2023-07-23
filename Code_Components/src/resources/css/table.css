@@ -26,3 +26,14 @@ body {
     height: 3.25rem;
     font-size: 1.25rem;
 }
+
+.game-area {
+    padding-top: 50px;
+    padding-bottom: 50px; 
+}
+
+main {
+    background-image: url("../img/Blackjack.png");
+    background-repeat: no-repeat;
+    background-size: cover;  
+}
