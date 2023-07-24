@@ -1,0 +1,62 @@
+/* Background Styling */
+body {
+  background: radial-gradient(circle at center, #757575, #000000);
+  background-size: 200%;
+  background-attachment: fixed;
+}
+
+/* BlackJack.Net Heading */
+.blackjack-heading .net {
+  color: #d12d36;
+}
+.blackjack-heading {
+  margin-top: 4rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  color: #fff;
+}
+.text-center {
+  text-align: center;
+}
+
+/* Login/Registration Box */
+.link {
+  color: blue;
+}
+.btn-primary {
+  background-color: #d12d36;
+}
+.card {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  background: linear-gradient(135deg, #d0d0d0, #ffffff);
+  margin: 20px auto;
+  padding: 20px;
+  max-width: 400px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Playing Cards */
+.card-images {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -1;
+}
+/* Apply the animation to playing card */
+.card-image {
+  position: absolute;
+  animation: floatUp 17s ease-in infinite;
+}
+@keyframes floatUp {
+  0% {
+    opacity: 1;
+    transform: translateY(100vh) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-400px) scale(0.2);
+  }
+}

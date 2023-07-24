@@ -2,10 +2,79 @@
 <%- include ('../partials/menu') %>
 
 <main>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="../../resources/css/profile.css">
   <div class="col"><%- include ('../partials/message') %></div>
-  <div class="container">
+  <body>  
+    <div class="welcome-message">
+      <h1>Welcome, <span class="red-text"><%= session.user.username %></span>!</h1>
+    </div>
 
-  </div>
+    <main class="profile-container">
+      <section class="stats-section">
+        <h2>Win–Loss–Tie Breakdown</h2>
+        <canvas id="winsLossesChart" width="400" height="400"></canvas>
+      </section>
+  
+      <section class="stats-section">
+        <h2>Playing Stats:</h2>
+        <p>Hands Played: <%= handsPlayed %></p>
+      </section>
+  
+      <section class="stats-section">
+        <h2>Most Common Cards Dealt:</h2>
+        <table>
+          <tr>
+            <th>Card</th>
+            <th>Frequency</th>
+          </tr>
+          <% mostCommonCards.forEach(card => { %>
+          <tr>
+            <td><%= card.card_name %></td>
+            <td><%= card.frequency %></td>
+          </tr>
+          <% }); %>
+        </table>
+      </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </body>
+
+  <script>
+    var wins = <%= wins %>;
+    var losses = <%= losses %>;
+    var ties = <%= ties %>;
+
+    document.addEventListener("DOMContentLoaded", function() {
+      var ctxWinsLosses = document.getElementById("winsLossesChart").getContext("2d");
+
+      var dataWinsLosses = {
+        labels: ["Wins", "Losses", "Ties"],
+        datasets: [{
+          data: [wins, losses, ties],
+          backgroundColor: ["#35d12d", "#d12d36", "#2d35d1"],
+          borderWidth: 1
+        }]
+      };
+
+      var optionsWinsLosses = {
+        responsive: false,
+        maintainAspectRatio: false,
+        title: {
+          display: true,
+          text: "Win/Loss Chart",
+          fontSize: 16
+        }
+      };
+
+      var winsLossesChart = new Chart(ctxWinsLosses, {
+        type: "pie",
+        data: dataWinsLosses,
+        options: optionsWinsLosses
+      });
+    });
+  </script>
 </main>
 
 <%- include ('../partials/footer') %>

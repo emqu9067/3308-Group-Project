@@ -1,28 +1,49 @@
+/* Background */
 body {
     font-family: Arial, Helvetica, sans-serif;
     text-align: center;
+    background: radial-gradient(circle at center, #757575, #000000);
+    background-size: 200%;
+    background-attachment: fixed;
 }
 
-#dealer-cards img {
-    height: 11rem;
-    width: 8rem;
-    margin: 0.1rem;
+/* Adjust Margin at top of Page */
+#table {
+    margin-top: 50px; 
 }
 
+/* Dealer & Player Cards */
+#dealer-cards img,
 #player-cards img {
     height: 11rem;
     width: 8rem;
     margin: 0.1rem;
 }
 
-#hit {
-    width: 6.5rem;
-    height: 3.25rem;
-    font-size: 1.25rem;
+/* Dealer & Player Text */
+h2 {
+    color: white;
+    text-shadow: 2px 2px 2px black; 
 }
 
-#stay {
+/* Buttons */
+button {
     width: 6.5rem;
     height: 3.25rem;
-    font-size: 1.25rem;
+    font-size: 1.1rem;
+    color: white;
+    background-color: #d12d36;
+    border: none;
+    cursor: pointer;
+    text-shadow: 1px 1px 1px black; 
+    border-radius: 8px;
+    font-weight: bold;
+}
+
+/* Results Messsage */
+#results {
+    margin-top: 1.5rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    color: #fff;
+    font-size: 2rem;
 }

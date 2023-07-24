@@ -1,0 +1,17 @@
+/* Menu Bar */
+.navbar {
+    background-color: #d12d36;
+    border-bottom: 2px solid white;
+}
+
+/* Page Text */
+.navbar-nav .nav-link {
+    color: white;
+    font-weight: bold;
+}
+
+/* Logout Text */
+#logout {
+    color: white;
+    font-weight: bold;
+}

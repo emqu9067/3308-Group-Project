@@ -1,0 +1,56 @@
+/* Background */
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    text-align: center;
+    background: radial-gradient(circle at center, #757575, #000000);
+    background-size: 200%;
+    background-attachment: fixed;
+}
+  
+/* Chart Layout */
+.profile-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding-top: 30px;
+}
+
+/* Section Styling*/
+.stats-section {
+    flex: 1;
+    max-width: 400px;
+    margin: 20px;
+    color: white;
+    text-shadow: 2px 2px 2px black;
+    margin-bottom: 15px;
+}
+
+/* Welcome, User! */
+.welcome-message {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    text-shadow: 2px 2px 2px black;
+    margin-top: 2.5rem;
+}
+.red-text {
+    color: #d12d36; 
+}
+
+/* Table Formating */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+th, td {
+    padding: 10px;
+    border-bottom: 1px solid white;
+}
+th {
+    background-color: #d12d36;
+}
