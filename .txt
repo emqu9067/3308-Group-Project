@@ -1,0 +1,65 @@
+project
+|-- src
+|   |-- index.js
+|   |-- package.json
+|   |-- package-lock.json
+|   |-- node_modules
+|   |-- resources
+|   |   |-- css
+|   |   |   |-- footer.css
+|   |   |   |-- login.css
+|   |   |   |-- menu.css
+|   |   |   |-- profile.css
+|   |   |   |-- table.css
+|   |   |-- img
+|   |   |   |-- cards
+|   |   |   |   |-- 2-C.svg
+|   |   |   |   |-- 2-D.svg
+|   |   |   |   |-- 2-H.svg
+|   |   |   |   |-- 2-S.svg
+|   |   |   |   |-- 3-C.svg
+|   |   |   |   |-- ...
+|   |   |-- js
+|   |   |   |-- blackjack.js
+|   |   |   |-- cardAnimation.js
+|   |-- views
+|   |   |-- pages
+|   |   |   |-- login.ejs
+|   |   |   |-- profile.ejs
+|   |   |   |-- register.ejs
+|   |   |   |-- table.ejs
+|   |   |-- partials
+|   |   |   |-- footer.ejs
+|   |   |   |-- head.ejs
+|   |   |   |-- menu.ejs
+|   |   |   |-- message.ejs
+|-- .env
+|-- docker-compose.yaml
+
+
+
+
+
+
+|-- resources
+|   |-- css
+|   |   |-- footer.css
+|   |   |-- login.css
+|   |   |-- ...
+|   |-- img
+|   |   |-- cards
+|   |   |   |-- ...
+|   |-- js
+|   |   |-- blackjack.js
+|   |   |-- cardAnimation.js
+|   |   |-- ...
+|-- views
+|   |-- pages
+|   |   |-- login.ejs
+|   |   |-- profile.ejs
+|   |   |-- ...
+|   |-- partials
+|   |   |-- footer.ejs
+|   |   |-- head.ejs
+|   |   |-- ...
+|-- .env

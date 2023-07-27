@@ -29,6 +29,6 @@ CREATE TABLE IF NOT EXISTS card (
   id SERIAL PRIMARY KEY NOT NULL,
   hand_id INT NOT NULL,
   suit VARCHAR(1),
-  rank SMALLINT,
+  rank VARCHAR(1),
   dealer_hand SMALLINT
 );
